@@ -1,5 +1,6 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+setlocal EnableExtensions
+REM Avoid EnableDelayedExpansion: "!" in log messages / msiexec args gets eaten.
 
 REM ============================================================
 REM Install Windows Exporter (CMD / no PowerShell required)
@@ -38,21 +39,23 @@ set "PRIVATE_IP="
 REM Try EC2 IMDSv2 (ignore errors on non-EC2)
 curl.exe -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60" --connect-timeout 2 --max-time 3 > "%TEMP%\ec2_token.txt" 2>nul
 set /p EC2_TOKEN=<"%TEMP%\ec2_token.txt"
-if defined EC2_TOKEN (
-  for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: !EC2_TOKEN!" "http://169.254.169.254/latest/meta-data/instance-id" --connect-timeout 2 --max-time 3 2^>nul`) do set "INSTANCE_ID=%%I"
-  for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: !EC2_TOKEN!" "http://169.254.169.254/latest/meta-data/instance-type" --connect-timeout 2 --max-time 3 2^>nul`) do set "INSTANCE_TYPE=%%I"
-  for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: !EC2_TOKEN!" "http://169.254.169.254/latest/meta-data/local-ipv4" --connect-timeout 2 --max-time 3 2^>nul`) do set "PRIVATE_IP=%%I"
-  for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: !EC2_TOKEN!" "http://169.254.169.254/latest/meta-data/placement/availability-zone" --connect-timeout 2 --max-time 3 2^>nul`) do set "AZ=%%I"
-  if defined PRIVATE_IP (
-    set "CLOUD=aws"
-    if defined AZ set "REGION=!AZ:~0,-1!"
-    echo [+] EC2 detected: !INSTANCE_ID! ^(!INSTANCE_TYPE!^) ^| IP: !PRIVATE_IP!
-  )
+if not defined EC2_TOKEN goto :after_ec2
+
+for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: %EC2_TOKEN%" "http://169.254.169.254/latest/meta-data/instance-id" --connect-timeout 2 --max-time 3 2^>nul`) do set "INSTANCE_ID=%%I"
+for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: %EC2_TOKEN%" "http://169.254.169.254/latest/meta-data/instance-type" --connect-timeout 2 --max-time 3 2^>nul`) do set "INSTANCE_TYPE=%%I"
+for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: %EC2_TOKEN%" "http://169.254.169.254/latest/meta-data/local-ipv4" --connect-timeout 2 --max-time 3 2^>nul`) do set "PRIVATE_IP=%%I"
+for /f "usebackq delims=" %%I in (`curl.exe -s -H "X-aws-ec2-metadata-token: %EC2_TOKEN%" "http://169.254.169.254/latest/meta-data/placement/availability-zone" --connect-timeout 2 --max-time 3 2^>nul`) do set "AZ=%%I"
+if defined PRIVATE_IP (
+  set "CLOUD=aws"
+  if defined AZ set "REGION=%AZ:~0,-1%"
+  echo [+] EC2 detected: %INSTANCE_ID% ^(%INSTANCE_TYPE%^) ^| IP: %PRIVATE_IP%
 )
+
+:after_ec2
 
 REM Fallback: first non-loopback IPv4 from ipconfig
 if not defined PRIVATE_IP (
-  echo [!] Not on EC2 or metadata unavailable — using local IP
+  echo [-] Not on EC2 or metadata unavailable - using local IP
   for /f "tokens=2 delims=:" %%A in ('ipconfig ^| findstr /c:"IPv4 Address"') do (
     for /f "tokens=* delims= " %%B in ("%%A") do (
       echo %%B | findstr /b "127." >nul
@@ -69,7 +72,7 @@ if not defined PRIVATE_IP (
 echo [+] Downloading Windows Exporter...
 where curl.exe >nul 2>&1
 if errorlevel 1 (
-  echo [!] curl.exe not found — trying certutil
+  echo [-] curl.exe not found - trying certutil
   certutil -urlcache -split -f "%URL%" "%MSI%" >nul
 ) else (
   curl.exe -fsSL "%URL%" -o "%MSI%"
@@ -84,7 +87,7 @@ if not exist "%MSI%" (
 )
 
 echo [+] Installing MSI...
-msiexec.exe /i "%MSI%" /quiet ENABLED_COLLECTORS=%COLLECTORS% LISTEN_PORT=%PORT% EXTRA_FLAGS="--collector.service.services-where=""State='Running'"""
+msiexec.exe /i "%MSI%" /qn /norestart ENABLED_COLLECTORS=%COLLECTORS% LISTEN_PORT=%PORT%
 if errorlevel 1 (
   echo [X] MSI install failed
   exit /b 1
@@ -129,5 +132,5 @@ echo           os: 'windows'
 echo.
 echo ======================================================
 echo.
-echo [!] Open firewall / security group inbound TCP %PORT% from Prometheus
+echo [-] Open firewall / security group inbound TCP %PORT% from Prometheus
 exit /b 0
