@@ -9,7 +9,7 @@ REM Downloads ONLY from GitHub (script + MSI). No local copy needed.
 REM Supports: Windows Server 2016, 2019, 2022 (on-prem / EC2 / VM)
 REM
 REM Usage (Admin Command Prompt):
-REM   curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/MethaNam/agent-prometheus/main/install-windows.cmd && %TEMP%\install-windows.cmd
+REM   curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/MethaNam/agent-prometheus/refs/heads/main/install-windows.cmd && %TEMP%\install-windows.cmd
 REM   install-windows.cmd 9182
 REM ============================================================
 

@@ -12,25 +12,25 @@ Repo: https://github.com/MethaNam/agent-prometheus
 ### Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MethaNam/agent-prometheus/main/install-linux.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/MethaNam/agent-prometheus/refs/heads/main/install-linux.sh | sudo bash
 ```
 
 Optional custom port:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MethaNam/agent-prometheus/main/install-linux.sh | sudo bash -s -- 9100
+curl -fsSL https://raw.githubusercontent.com/MethaNam/agent-prometheus/refs/heads/main/install-linux.sh | sudo bash -s -- 9100
 ```
 
 ### Windows — PowerShell (Admin)
 
 ```powershell
-irm https://raw.githubusercontent.com/MethaNam/agent-prometheus/main/install-windows.ps1 | iex
+irm https://raw.githubusercontent.com/MethaNam/agent-prometheus/refs/heads/main/install-windows.ps1 | iex
 ```
 
 ### Windows — CMD only, no PowerShell (Admin)
 
 ```bat
-curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/MethaNam/agent-prometheus/main/install-windows.cmd && %TEMP%\install-windows.cmd
+curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/MethaNam/agent-prometheus/refs/heads/main/install-windows.cmd && %TEMP%\install-windows.cmd
 ```
 
 Optional custom port:
@@ -78,7 +78,8 @@ install-windows.cmd 9182
 ## Notes
 
 - Install **only from GitHub** — do not copy MSI/scripts from a local laptop
-- Scripts + binaries are downloaded from GitHub (`raw.githubusercontent.com` + GitHub Releases)
+- Scripts + binaries are downloaded from GitHub (`raw.githubusercontent.com/.../refs/heads/main/...` + GitHub Releases)
+- Prefer `refs/heads/main` raw URLs (avoids stale CDN cache on `/main/`)
 - No Prometheus server credentials are embedded
 - Windows scripts work on EC2 and on-prem (falls back to local hostname/IP)
 - Use `install-windows.cmd` when PowerShell is blocked but CMD is available
