@@ -77,7 +77,9 @@ install-windows.cmd 9182
 
 ## Notes
 
-- Scripts download official release binaries from GitHub
+- Install **only from GitHub** — do not copy MSI/scripts from a local laptop
+- Scripts + binaries are downloaded from GitHub (`raw.githubusercontent.com` + GitHub Releases)
 - No Prometheus server credentials are embedded
 - Windows scripts work on EC2 and on-prem (falls back to local hostname/IP)
 - Use `install-windows.cmd` when PowerShell is blocked but CMD is available
+- Target servers need outbound HTTPS to GitHub
