@@ -96,7 +96,8 @@ echo [+] Opening Windows Firewall port %PORT%...
 netsh advfirewall firewall delete rule name="Windows Exporter Prometheus %PORT%" >nul 2>&1
 netsh advfirewall firewall add rule name="Windows Exporter Prometheus %PORT%" dir=in action=allow protocol=TCP localport=%PORT% >nul
 
-timeout /t 3 /nobreak >nul
+REM Use ping wait instead of timeout — timeout fails under WinRM (no console input)
+ping -n 4 127.0.0.1 >nul
 
 sc query windows_exporter | findstr /I "RUNNING" >nul
 if errorlevel 1 (

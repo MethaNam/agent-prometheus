@@ -69,7 +69,7 @@ Invoke-WebRequest -Uri $url -OutFile $msi -UseBasicParsing
 
 $collectors = "cpu,cs,logical_disk,memory,net,os,process,service,system,tcp"
 Log "Installing..."
-$msiArgs = "/i `"$msi`" /quiet ENABLED_COLLECTORS=$collectors LISTEN_PORT=$Port EXTRA_FLAGS=`"--collector.service.services-where=`"State='Running'`"`""
+$msiArgs = "/i `"$msi`" /qn /norestart ENABLED_COLLECTORS=$collectors LISTEN_PORT=$Port"
 Start-Process msiexec.exe -ArgumentList $msiArgs -Wait
 
 Log "Opening Windows Firewall port $Port..."
