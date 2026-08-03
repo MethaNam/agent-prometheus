@@ -7,30 +7,30 @@ Install Prometheus exporters on any server:
 
 ## Quick install (public one-liner)
 
-After this repo is public on GitHub, replace `OWNER/REPO` below.
+Repo: https://github.com/methadevil-ux/monitor-agent
 
 ### Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install-linux.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/methadevil-ux/monitor-agent/main/install-linux.sh | sudo bash
 ```
 
 Optional custom port:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install-linux.sh | sudo bash -s -- 9100
+curl -fsSL https://raw.githubusercontent.com/methadevil-ux/monitor-agent/main/install-linux.sh | sudo bash -s -- 9100
 ```
 
 ### Windows — PowerShell (Admin)
 
 ```powershell
-irm https://raw.githubusercontent.com/OWNER/REPO/main/install-windows.ps1 | iex
+irm https://raw.githubusercontent.com/methadevil-ux/monitor-agent/main/install-windows.ps1 | iex
 ```
 
 ### Windows — CMD only, no PowerShell (Admin)
 
 ```bat
-curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/OWNER/REPO/main/install-windows.cmd && %TEMP%\install-windows.cmd
+curl -fsSL -o %TEMP%\install-windows.cmd https://raw.githubusercontent.com/methadevil-ux/monitor-agent/main/install-windows.cmd && %TEMP%\install-windows.cmd
 ```
 
 Optional custom port:
